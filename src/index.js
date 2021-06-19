@@ -1,17 +1,42 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import * as ReactDOM from 'react-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+
+import './index.css'
+import Main from './views/'
+import Theme from './theme/'
+import Product from './views/product/'
+
+const App = () => {
+    return (
+        <Router>
+            {/*
+          A <Switch> looks through all its children <Route>
+          elements and renders the first one whose path
+          matches the current URL. Use a <Switch> any time
+          you have multiple routes, but you want only one
+          of them to render at a time
+        */}
+            <Theme>
+                <Switch>
+                    <Route exact path="/">
+                        <Main />
+                    </Route>
+                    <Route exact path="/view/:productId">
+                        <Product />
+                    </Route>
+                    <Route exact path="/edit/:productId">
+                        <Product edit={true} />
+                    </Route>
+                </Switch>
+            </Theme>
+        </Router>
+    )
+}
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+    <div className="App">
+        <App />
+    </div>,
+    document.getElementById('root')
+)
