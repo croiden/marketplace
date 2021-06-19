@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { useParams, useHistory } from 'react-router-dom'
 
-import { getProducts, updateProduct, getById } from '../../utils/index'
+import { getProducts, updateProduct, getById, isFormUpdated } from '../../utils/index'
 
 import InputField from './input-field'
 import SelectField from './select-field'
@@ -69,8 +69,10 @@ function Product() {
 
     React.useEffect(() => {
         const prod = getById(getProducts(), Number(productId))[0]
-        setProduct(prod)
-        document.title = `${mode === 'edit' ? 'Edit' : 'View'}: ${prod.productName}`
+        if (prod) {
+            setProduct(prod)
+            document.title = `${mode === 'edit' ? 'Edit' : 'View'}: ${prod.productName}`
+        }
     }, [productId, mode])
 
     const handleEditClick = () => {
@@ -80,75 +82,86 @@ function Product() {
     const handleSubmit = (event) => {
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
-        const fieldValues = Object.fromEntries(formData.entries())
-        updateProduct(product.productId, {
+        let fieldValues = Object.fromEntries(formData.entries())
+        fieldValues = {
             ...fieldValues,
             productPrice: Number(fieldValues.productPrice),
             salePrice: Number(fieldValues.salePrice),
-        })
-        setSaved(true)
+        }
+        if (isFormUpdated(product, fieldValues)) {
+            setProduct({
+                ...product,
+                ...fieldValues,
+            })
+            updateProduct(product.productId, fieldValues)
+            setSaved(true)
+        }
     }
-    return product ? (
+    return (
         <Container>
-            <StyledForm readOnly={READ_ONLY} onSubmit={handleSubmit}>
-                <FloatingPhoto>
-                    <Photo productName={product.productName} source={product.productImage} />
-                </FloatingPhoto>
-                <InputField
-                    name={'productName'}
-                    label={'Product Name'}
-                    inputProps={{
-                        id: 'productName',
-                        name: 'productName',
-                        type: 'text',
-                        defaultValue: product.productName,
-                        required: true,
-                        readOnly: READ_ONLY,
-                    }}
-                />
-                <SelectField
-                    name={'productCategory'}
-                    label={'Product Category'}
-                    options={CATEGORY_OPTIONS}
-                    selectProps={{
-                        id: 'productCategory',
-                        name: 'productCategory',
-                        defaultValue: product.productCategory,
-                        required: true,
-                        readOnly: READ_ONLY,
-                    }}
-                />
-                <InputField
-                    name={'productPrice'}
-                    label={'Product Price'}
-                    inputProps={{
-                        id: 'productPrice',
-                        name: 'productPrice',
-                        step: 'any',
-                        type: 'number',
-                        defaultValue: product.productPrice,
-                        required: true,
-                        readOnly: READ_ONLY,
-                    }}
-                />
-                <InputField
-                    name={'salePrice'}
-                    label={'Sale Price'}
-                    inputProps={{
-                        id: 'salePrice',
-                        name: 'salePrice',
-                        step: 'any',
-                        type: 'number',
-                        defaultValue: product.salePrice,
-                        required: true,
-                        readOnly: READ_ONLY,
-                    }}
-                />
-                {READ_ONLY ? <StyledButton type="button" value="Edit" onClick={handleEditClick} /> : <StyledButton type="submit" value="Save" />}
-                <StyledP>{saved ? 'Saved Successfully...' : null}</StyledP>
-            </StyledForm>
+            {product ? (
+                <StyledForm readOnly={READ_ONLY} onSubmit={handleSubmit}>
+                    <FloatingPhoto>
+                        <Photo productName={product.productName} source={product.productImage} />
+                    </FloatingPhoto>
+                    <InputField
+                        name={'productName'}
+                        label={'Product Name'}
+                        inputProps={{
+                            id: 'productName',
+                            name: 'productName',
+                            type: 'text',
+                            defaultValue: product.productName,
+                            required: true,
+                            readOnly: READ_ONLY,
+                        }}
+                    />
+                    <SelectField
+                        name={'productCategory'}
+                        label={'Product Category'}
+                        options={CATEGORY_OPTIONS}
+                        selectProps={{
+                            id: 'productCategory',
+                            name: 'productCategory',
+                            defaultValue: product.productCategory,
+                            required: true,
+                            readOnly: READ_ONLY,
+                        }}
+                    />
+                    <InputField
+                        name={'productPrice'}
+                        label={'Product Price'}
+                        inputProps={{
+                            id: 'productPrice',
+                            name: 'productPrice',
+                            step: 'any',
+                            type: 'number',
+                            defaultValue: product.productPrice,
+                            required: true,
+                            readOnly: READ_ONLY,
+                        }}
+                    />
+                    <InputField
+                        name={'salePrice'}
+                        label={'Sale Price'}
+                        inputProps={{
+                            id: 'salePrice',
+                            name: 'salePrice',
+                            step: 'any',
+                            type: 'number',
+                            defaultValue: product.salePrice,
+                            required: true,
+                            readOnly: READ_ONLY,
+                        }}
+                    />
+                    {READ_ONLY ? <StyledButton type="button" value="Edit" onClick={handleEditClick} /> : <StyledButton type="submit" value="Save" />}
+                    <StyledP>{saved ? 'Saved Successfully...' : null}</StyledP>
+                </StyledForm>
+            ) : (
+                <h2>{'No product found'}</h2>
+            )}
         </Container>
-    ) : null
+    )
 }
 
 export default Product

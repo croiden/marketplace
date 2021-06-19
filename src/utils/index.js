@@ -52,3 +52,5 @@ export const updateProduct = (id, product) => {
     }
     localStorage.setItem(KEY, JSON.stringify(data))
 }
+
+export const isFormUpdated = (prevObj, newObj) => (Object.keys(newObj).filter((key) => newObj[key] !== prevObj[key]).length > 0 ? true : false)
