@@ -14,9 +14,6 @@ const Container = styled.div`
     margin: 10px;
     width: 100%;
     min-height: 100px;
-    &:hover {
-        box-shadow: rgb(43 46 207 / 50%) 0px 5px 19px;
-    }
     @media (max-width: ${(props) => props.theme.breakpoints.mobile}px) {
         width: calc(100vw - 20px);
     }

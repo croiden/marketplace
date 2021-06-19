@@ -22,11 +22,8 @@ const App = () => {
                     <Route exact path="/">
                         <Main />
                     </Route>
-                    <Route exact path="/view/:productId">
+                    <Route exact path="/:mode/:productId">
                         <Product />
-                    </Route>
-                    <Route exact path="/edit/:productId">
-                        <Product edit={true} />
                     </Route>
                 </Switch>
             </Theme>
