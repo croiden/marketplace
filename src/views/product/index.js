@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { useParams, useHistory } from 'react-router-dom'
 
-import raw_products from '../../products.json'
+import { getProducts, updateProduct, getById } from '../../utils/index'
 
 import InputField from './input-field'
 import SelectField from './select-field'
@@ -42,19 +42,33 @@ const FloatingPhoto = styled.div`
         box-shadow: rgb(43 46 207 / 50%) 0px 5px 19px;
     }
 `
-const getById = (arr, id) => arr.filter((a) => a.productId === id)[0]
+
+const StyledP = styled.p`
+    margin: 0 30px;
+    height: 18px;
+    color: ${(props) => props.theme.colors.darkGrey};
+`
 
 const CATEGORY_OPTIONS = ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5']
 
 function Product() {
     const { productId, mode } = useParams()
     const [product, setProduct] = React.useState()
+    const [saved, setSaved] = React.useState(false)
     const READ_ONLY = mode === 'edit' ? false : true
 
     const history = useHistory()
 
     React.useEffect(() => {
-        const prod = getById(raw_products, Number(productId))
+        if (saved) {
+            setTimeout(() => {
+                setSaved(false)
+            }, 2000)
+        }
+    }, [saved])
+
+    React.useEffect(() => {
+        const prod = getById(getProducts(), Number(productId))[0]
         setProduct(prod)
         document.title = `${mode === 'edit' ? 'Edit' : 'View'}: ${prod.productName}`
     }, [productId, mode])
@@ -67,8 +81,12 @@ function Product() {
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
-        console.log(`Fast Form Submitted`, fieldValues)
-        // push this to localStorage
+        updateProduct(product.productId, {
+            ...fieldValues,
+            productPrice: Number(fieldValues.productPrice),
+            salePrice: Number(fieldValues.salePrice),
+        })
+        setSaved(true)
     }
     return product ? (
         <Container>
@@ -127,6 +145,7 @@ function Product() {
                     }}
                 />
                 {READ_ONLY ? <StyledButton type="button" value="Edit" onClick={handleEditClick} /> : <StyledButton type="submit" value="Save" />}
+                <StyledP>{saved ? 'Saved Successfully...' : null}</StyledP>
             </StyledForm>
         </Container>
     ) : null

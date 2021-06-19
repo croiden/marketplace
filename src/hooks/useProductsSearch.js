@@ -1,15 +1,16 @@
 // @flow
 import { useEffect, useState } from 'react'
 
-import raw_products from '../products.json'
+import { getProducts } from '../utils/index.js'
 
 const PAGE_SIZE = 10
 export default function useProductsSearch(query? = '', page, sortBy = '') {
-    const [products, setProducts] = useState(raw_products.slice(0, PAGE_SIZE))
+    const [products, setProducts] = useState(getProducts().slice(0, PAGE_SIZE))
     const [hasMore, setHasMore] = useState(true)
 
     useEffect(() => {
-        let _products = raw_products
+        const p = getProducts()
+        let _products = p
         if (query) {
             const queryUp = query.toUpperCase()
             _products = _products.filter((p) => {
@@ -33,7 +34,7 @@ export default function useProductsSearch(query? = '', page, sortBy = '') {
         }
         const noOfProducts = PAGE_SIZE * page
         setProducts(_products.slice(0, noOfProducts))
-        setHasMore(raw_products.length > noOfProducts)
+        setHasMore(p.length > noOfProducts)
     }, [query, page, sortBy])
 
     return { products, hasMore }
